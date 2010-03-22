@@ -27,7 +27,8 @@ class YubiKeyTool():
             
             if mode != 'online':
                 aes_key = self.__prompt('AES key: ', validate_function = self.__check_aes_key, error_msg = 'Invalid AES key')
-                otp = self.__prompt('OTP: ', validate_function = self.__check_otp, validate_function_kwargs = {'aes_key': aes_key}, error_msg = 'Invalid OTP length')
+                otp = self.__prompt('OTP: ', validate_function = self.__check_otp, validate_function_kwargs = {'aes_key': aes_key}, \
+                                    error_msg = 'Invalid OTP length')
             else:
                 aes_key = ''
                 otp = self.__prompt('OTP: ', validate_function = self.__check_otp_length, error_msg = 'Invalid OTP length')
@@ -44,13 +45,13 @@ class YubiKeyTool():
         print 'User ID\t\t: %s' % (user_id)
         print 'Mode\t\t: %s' % (mode)
         
-        status = self.__prompt('Is this information correct? [y/n]: ', valid_options = ['y', 'n'])
+        confirmation = self.__prompt('Is this information correct? [y/n]: ', valid_options = ['y', 'n']).lower()
         
-        if status == 'n':
+        if confirmation == 'n':
             return
         
         print ''
-        if self.__check_user_exists(username, user_id):
+        if self.__database_entry_exists(username = username, user_id =  user_id):
             print 'User with this username and user ID already exists.'
             return
         
@@ -59,13 +60,17 @@ class YubiKeyTool():
         else:
             print 'Error occurred - user could not be added to the database.'
     
+    # @todo: to implement        
+    def edit_yubikey(self):
+        pass
+    
     def delete_yubikey(self):
         print 'Delete a YubiKey from the database\n'
         
         username = self.__prompt('Username: ')
         user_id = self.__prompt('User ID: ')
         
-        if self.__check_user_exists(username, user_id):
+        if self.__database_entry_exists(username = username, user_id =  user_id):
             self.__delete_yubikey_from_database(username, user_id)
             print 'User with ID %s has been successfully deleted' % (user_id)
         else:
@@ -77,9 +82,9 @@ class YubiKeyTool():
         username = self.__prompt('Username: ')
         user_id = self.__prompt('User ID: ')
         
-        if not self.__check_user_exists(username, user_id):
+        if not self.__database_entry_exists(username = username, user_id =  user_id):
             print 'User with this username and user ID is not in the database'
-        elif not self.__check_yubikey_is_enabled(username, user_id):
+        elif self.__database_entry_exists(enabled = 0, username = username, user_id = user_id):
             print 'Yubikey for this user is already disabled'
         else:
             self.__disable_yubikey_in_database(username, user_id)
@@ -91,25 +96,25 @@ class YubiKeyTool():
         username = self.__prompt('Username: ')
         user_id = self.__prompt('User ID: ')
         
-        if not self.__check_user_exists(username, user_id):
+        if not self.__database_entry_exists(username = username, user_id =  user_id):
             print 'User with this username and user ID is not in the database'
-        elif self.__check_yubikey_is_enabled(username, user_id):
+        elif self.__database_entry_exists(enabled = 1, username = username, user_id = user_id):
             print 'Yubikey for this user is already enabled'
         else:
             self.__enable_yubikey_in_database(username, user_id)
             print 'Yubikey for user with username %s and user ID %s has been successfully re-enabled' % (username, user_id)
     
     def display_database_info(self):
-        self.cursor.execute("SELECT username, client_id, mode, enabled FROM yubikeys")
+        self.cursor.execute("SELECT id, username, client_id, mode, enabled FROM yubikeys")
         result = self.cursor.fetchall()
     
         print 'YubiKeys in the database:\n'
     
         count = len(result)
         if count > 0:
-            print 'Username\t | Client ID\t | Mode\t | Status'
+            print 'ID\t | Username\t | Client ID\t | Mode\t | Status'
             for row in result:
-                print '%s\t | %d\t | %s\t | %s' % (row[0], row[1], row[2], 'enabled' if row[3] == 1 else 'disabled')
+                print '%d\t | %s\t | %d\t | %s\t | %s' % (row[0], row[1], row[2], row[3], 'enabled' if row[4] == 1 else 'disabled')
         
             print '\nTotal: %d' % (count)
         else:
@@ -144,7 +149,7 @@ class YubiKeyTool():
         
         return self.cursor.rowcount
         
-    def __prompt(self, message, required = True, validate_function = None, validate_function_kwargs = None, error_msg = '', valid_options = None):
+    def __prompt(self, message, required = True, validate_function = None, validate_function_kwarg_name = 'input', validate_function_kwargs = None, error_msg = '', valid_options = None):
         input = None
         
         while not input:
@@ -154,7 +159,7 @@ class YubiKeyTool():
                 return input
             
             if validate_function and input:
-                kwargs = {'input': input}
+                kwargs = {'%s' % (validate_function_kwarg_name): input}
                 
                 if validate_function_kwargs:
                     kwargs.update(validate_function_kwargs)
@@ -165,7 +170,7 @@ class YubiKeyTool():
                     print error_msg
                     input = None
     
-            if valid_options and (input not in valid_options):
+            if valid_options and (input.lower() not in valid_options):
                 print 'Valid options are: %s' % ('/' . join(valid_options))
                 input = None
             
@@ -204,23 +209,13 @@ class YubiKeyTool():
         self.yubikey = yubikey
         return True
     
-    def __check_user_exists(self, username, user_id):
-        """ Returns True if a user with provided username and user ID exists, False otherwise. """
+    def __database_entry_exists(self, **kwargs):
+        """ Returns True if a database entry with provided values exist, False otherwise. """
         
-        self.cursor.execute("SELECT id FROM yubikeys WHERE username = :username AND user_id = :user_id", \
-                            {'username': username, 'user_id': user_id})
-        result = self.cursor.fetchone()
+        where_clause = ['%s = :%s' % (key, key) for key in kwargs]
+        where_clause = ' AND ' . join(where_clause)
         
-        if result:
-            return True
-        
-        return False
-    
-    def __check_yubikey_is_enabled(self, username, user_id):
-        """ Returns True if a yubikey for a user with provided username is enabled, False otherwise. """
-        
-        self.cursor.execute("SELECT id FROM yubikeys WHERE enabled = 1 AND username = :username AND user_id = :user_id", \
-                            {'username': username, 'user_id': user_id})
+        self.cursor.execute("SELECT id FROM yubikeys WHERE %s" % (where_clause), kwargs)
         result = self.cursor.fetchone()
         
         if result:
@@ -238,33 +233,33 @@ class YubiKeyTool():
             sys.exit(0)
 
 if __name__ == '__main__':
-    parser = optparse.OptionParser(version = '%prog')
-    parser.add_option('-a', '--add', action = 'store_true', default = False, dest = 'mode_add', help = 'add a new yubikey to database')
-    parser.add_option('-d', '--delete', action = 'store_true', default = False, dest = 'mode_delete', help = 'delete an existing key from database')
-    parser.add_option('--disable', action = 'store_true', default = False, dest = 'mode_disable', help = 'disable a yubikey')
-    parser.add_option('--enable', action = 'store_true', default = False, dest = 'mode_enable', help = 'enable a previously disabled yubikey')
+    available_actions = {'add': 'add_yubikey',
+                         'edit': 'edit_yubikey',
+                         'delete': 'delete_yubikey',
+                         'disable': 'disable_yubikey',
+                         'enable': 'enable_yubikey',
+                         'info': 'display_database_info'
+    }
     
-    parser.add_option('-i', '--info', action = 'store_true', default = False, dest = 'mode_info', help = 'displays database information')
+    parser = optparse.OptionParser(version = '%prog')
+    parser.add_option('-a', '--add', action = 'store_true', default = False, dest = 'add', help = 'add a new yubikey to database')
+    parser.add_option('-e', '--edit', action = 'store_true', default = False, dest = 'edit', help = 'edit an existing database entry')
+    parser.add_option('-d', '--delete', action = 'store_true', default = False, dest = 'delete', help = 'delete an existing key from database')
+    parser.add_option('--disable', action = 'store_true', default = False, dest = 'disable', help = 'disable a yubikey')
+    parser.add_option('--enable', action = 'store_true', default = False, dest = 'enable', help = 'enable a previously disabled yubikey')
+    
+    parser.add_option('-i', '--info', action = 'store_true', default = False, dest = 'info', help = 'displays database information')
 
     (options, args) = parser.parse_args()
     options = vars(options)
 
-    if not options['mode_add'] and not options['mode_delete'] and not options['mode_disable'] and not options['mode_enable'] and not options['mode_info']:
+    selected_option = [available_actions[key] for key, value in options.iteritems() if value == True]
+    
+    if not selected_option:
         parser.error('you must supply an action')
+        
+    if len(selected_option) > 1:
+        parser.error('you can only choose one action')
     
     yubiKeyTool = YubiKeyTool()
-    
-    if options['mode_add']:
-        yubiKeyTool.add_yubikey()
-        
-    if options['mode_delete']:
-        yubiKeyTool.delete_yubikey()
-        
-    if options['mode_disable']:
-        yubiKeyTool.disable_yubikey()
-        
-    if options['mode_enable']:
-        yubiKeyTool.enable_yubikey()
-        
-    if options['mode_info']:
-        yubiKeyTool.display_database_info()
+    getattr(yubiKeyTool, selected_option[0])()

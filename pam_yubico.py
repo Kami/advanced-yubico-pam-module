@@ -10,7 +10,7 @@
 # http://code.google.com/p/yubico-pam/wiki/ReadMe
 #            
 # Author: Tomaž Muraus (http://www.tomaz-muraus.info)
-# Version: 0.1.0-dev
+# Version: 0.2.0-dev
 
 # Requirements:
 # - Python >= 2.6

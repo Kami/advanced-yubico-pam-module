@@ -22,7 +22,6 @@ import os
 import sys
 import logging
 
-sys.path.append(os.path.dirname(__file__))
 from pam_yubico import ykcheck
 
 # Setup logging

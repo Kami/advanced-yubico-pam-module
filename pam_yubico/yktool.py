@@ -70,7 +70,7 @@ class YubiKeyTool():
         username = self.__prompt('Username: ')
         user_id = self.__prompt('User ID: ')
         
-        if self.__database_entry_exists(username = username, user_id =  user_id):
+        if self.__database_entry_exists(username = username, user_id = user_id):
             self.__delete_yubikey_from_database(username, user_id)
             print 'User with ID %s has been successfully deleted' % (user_id)
         else:

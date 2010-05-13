@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configuring PAM &mdash; pam_yubico_advanced v0.3.0.dev documentation</title>
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.3.0.dev',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="pam_yubico_advanced v0.3.0.dev documentation" href="index.html" />
+    <link rel="next" title="Using yktool" href="using_yktool.html" />
+    <link rel="prev" title="Installing pam_python" href="installing_pam_python.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="using_yktool.html" title="Using yktool"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installing_pam_python.html" title="Installing pam_python"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pam_yubico_advanced v0.3.0.dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="configuring-pam">
+<h1>Configuring PAM<a class="headerlink" href="#configuring-pam" title="Permalink to this headline">¶</a></h1>
+<p>PAM configuration is somewhat complex, but a typical use-case is to require both a password and Yubikey to allow access.</p>
+<p>This can be achieved by a PAM configuration like this:</p>
+<div class="highlight-python"><pre>auth required pam_unix.so nullok_secure
+auth required pam_python.so pam_yubico.py</pre>
+</div>
+<p>Alternatively, if you only want require YubiKey to log in, remove the first line, so your config file now looks like this:</p>
+<div class="highlight-python"><pre>auth required pam_python.so pam_yubico.py</pre>
+</div>
+<p><em>Note 1: On Ubuntu / Debian, PAM related configuration files are located in  the</em> <tt class="docutils literal"><span class="pre">/etc/pam.d</span></tt> <em>directory.</em></p>
+<p><em>Note 2: Be sure to uncomment any other &#8216;auth&#8217; lines in your PAM configuration, unless you want does. For example, Ubuntu and Debian contains a &#8216;&#64;include common-auth&#8217; which would confuse the configuration.</em></p>
+<div class="section" id="module-parameters">
+<h2>Module parameters<a class="headerlink" href="#module-parameters" title="Permalink to this headline">¶</a></h2>
+<p>This module supports the following parameters:</p>
+<ol class="arabic simple">
+<li>debug:</li>
+</ol>
+<blockquote>
+auth required pam_python.so pam_yubico.py debug</blockquote>
+<p>Enables the debug mode which logs all the messages to the <tt class="docutils literal"><span class="pre">/var/log/pam_yubico.log</span></tt> file.</p>
+<ol class="arabic simple" start="2">
+<li>alwaysok:</li>
+</ol>
+<blockquote>
+auth required pam_python.so pam_yubico.py alwaysok=1</blockquote>
+<p>Setting this parameter to <tt class="docutils literal"><span class="pre">1</span></tt> will enable the presentation mode (all the authentication attempts will succeed)</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Configuring PAM</a><ul>
+<li><a class="reference external" href="#module-parameters">Module parameters</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="installing_pam_python.html"
+                                  title="previous chapter">Installing pam_python</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="using_yktool.html"
+                                  title="next chapter">Using yktool</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="sources/configuring_pam.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="using_yktool.html" title="Using yktool"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installing_pam_python.html" title="Installing pam_python"
+             >previous</a> |</li>
+        <li><a href="index.html">pam_yubico_advanced v0.3.0.dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Tomaž Muraus.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

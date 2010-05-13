@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FAQ &mdash; pam_yubico_advanced v0.3.0.dev documentation</title>
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.3.0.dev',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="pam_yubico_advanced v0.3.0.dev documentation" href="index.html" />
+    <link rel="prev" title="Using yktool" href="using_yktool.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="using_yktool.html" title="Using yktool"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pam_yubico_advanced v0.3.0.dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="faq">
+<h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="why-have-you-created-this-module">
+<h2>Why have you created this module?<a class="headerlink" href="#why-have-you-created-this-module" title="Permalink to this headline">¶</a></h2>
+<p>I have created this module, because the <a class="reference external" href="http://code.google.com/p/yubico-pam/">original Yubico PAM module</a> written in C was not working on my computer (it was segfaulting).</p>
+<p>I have spent a few hours debugging it, but I could not locate the problem so I have just decided to write a new module which performs the same task in Python.</p>
+<p>P.S. Apparently that is known problem on 64 bit systems (<a class="reference external" href="http://forum.yubico.com/viewtopic.php?f=3&amp;t=254&amp;st=0&amp;sk=t&amp;sd=a&amp;hilit=segfault&amp;start=0">forum thread #1</a>, <a class="reference external" href="http://forum.yubico.com/viewtopic.php?f=3&amp;t=507&amp;start=0&amp;st=0&amp;sk=t&amp;sd=a&amp;hilit=segfault">my forum thread</a>).</p>
+</div>
+<div class="section" id="why-python">
+<h2>Why Python?<a class="headerlink" href="#why-python" title="Permalink to this headline">¶</a></h2>
+<p>I know that using Python for a PAM module is not really the best and most efficient way, but since my C knowledge is pretty basic, I decided to stick to Python.</p>
+<p>It currently works fine for me and should also work for other users who have problems with the original C extension or want extra features (for example offline validation).</p>
+</div>
+<div class="section" id="what-is-the-difference-between-this-sometimes-referred-to-as-pam-yubico-advanced-and-the-other-pam-yubico-package">
+<h2>What is the difference between this (sometimes referred to as pam_yubico_advanced) and the other pam_yubico package?<a class="headerlink" href="#what-is-the-difference-between-this-sometimes-referred-to-as-pam-yubico-advanced-and-the-other-pam-yubico-package" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://github.com/Kami/yubico-pam-module">pam_yubico</a> module is a first module which I have created after having problems with the original module written in C.</p>
+<p>It is basically just a quick working solution which only supports online validation.</p>
+<p>This development of pam_yubico module is now discarded in favor of this package.</p>
+</div>
+<div class="section" id="how-can-i-protect-my-gnome-screensaver-with-a-yubikey">
+<h2>How can I protect my GNOME screensaver with a YubiKey?<a class="headerlink" href="#how-can-i-protect-my-gnome-screensaver-with-a-yubikey" title="Permalink to this headline">¶</a></h2>
+<p>You can protect your screensaver by putting the appropriate line into your <tt class="docutils literal"><span class="pre">gnome-screensaver</span></tt> PAM config file.</p>
+<p>In Ubuntu this can be achieved by putting the following line to the <tt class="docutils literal"><span class="pre">/etc/pam.d/gnome-screensaver</span></tt> file:</p>
+<div class="highlight-python"><pre>auth required pam_python.so pam_yubico.py</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">FAQ</a><ul>
+<li><a class="reference external" href="#why-have-you-created-this-module">Why have you created this module?</a></li>
+<li><a class="reference external" href="#why-python">Why Python?</a></li>
+<li><a class="reference external" href="#what-is-the-difference-between-this-sometimes-referred-to-as-pam-yubico-advanced-and-the-other-pam-yubico-package">What is the difference between this (sometimes referred to as pam_yubico_advanced) and the other pam_yubico package?</a></li>
+<li><a class="reference external" href="#how-can-i-protect-my-gnome-screensaver-with-a-yubikey">How can I protect my GNOME screensaver with a YubiKey?</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="using_yktool.html"
+                                  title="previous chapter">Using yktool</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="sources/faq.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="using_yktool.html" title="Using yktool"
+             >previous</a> |</li>
+        <li><a href="index.html">pam_yubico_advanced v0.3.0.dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Tomaž Muraus.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

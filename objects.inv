@@ -1,0 +1,4 @@
+# Sphinx inventory version 1
+# Project: pam_yubico_advanced
+# Version: 0.3.0.dev
+pam_yubico mod index.html

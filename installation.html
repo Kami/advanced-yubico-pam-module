@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &mdash; pam_yubico_advanced v0.3.0.dev documentation</title>
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.3.0.dev',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="pam_yubico_advanced v0.3.0.dev documentation" href="index.html" />
+    <link rel="next" title="Installing pam_python" href="installing_pam_python.html" />
+    <link rel="prev" title="Requirements" href="requirements.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="installing_pam_python.html" title="Installing pam_python"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="requirements.html" title="Requirements"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pam_yubico_advanced v0.3.0.dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installing-the-dependencies">
+<h2>1. Installing the dependencies<a class="headerlink" href="#installing-the-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>For this module to work, you need the <a class="reference external" href="http://docs.python.org/library/sqlite3.html">sqlite3</a> package and the <a class="reference external" href="http://ace-host.stuart.id.au/russell/files/pam_python/">pam_python</a> module and it&#8217;s dependencies.</p>
+<p>If you are using Python &gt;= 2.5 you should already have the sqlite3 module installed so you can skip the step bellow.</p>
+<p>Alternatively, if you don&#8217;t and you are using Ubuntu / Debian you can install the <tt class="docutils literal"><span class="pre">python-sqlite</span></tt> package using APT:</p>
+<div class="highlight-python"><pre>sudo apt-get install python-sqlite</pre>
+</div>
+<p>For the instructions how to do install the <a class="reference external" href="http://ace-host.stuart.id.au/russell/files/pam_python/">pam_python</a> module, visit the <a class="reference external" href="installing_pam_python.html"><em>Installing pam_python</em></a> page.</p>
+</div>
+<div class="section" id="installing-this-module">
+<h2>2. Installing this module<a class="headerlink" href="#installing-this-module" title="Permalink to this headline">¶</a></h2>
+<p>You can install the latest stable version from PyPi:</p>
+<div class="highlight-python"><pre>sudo pip install pam_yubico</pre>
+</div>
+<p>or the latest development version from the git repository:</p>
+<div class="highlight-python"><pre>sudo pip -e install git://github.com/Kami/advanced-yubico-pam-module.git#egg=pam_yubico</pre>
+</div>
+</div>
+<div class="section" id="create-an-empty-log-file">
+<h2>3. Create an empty log file<a class="headerlink" href="#create-an-empty-log-file" title="Permalink to this headline">¶</a></h2>
+<p>After the module has been successfully installed you need to create an empty file where the module log messages will be saved:</p>
+<div class="highlight-python"><pre>sudo touch /var/log/pam_yubico.log</pre>
+</div>
+<p>You also need to give it the appropriate permissions else the module won&#8217;t work:</p>
+<div class="highlight-python"><pre>sudo chmod go+w /var/log/pam_yubico.log</pre>
+</div>
+</div>
+<div class="section" id="add-one-or-more-yubikeys">
+<h2>4. Add one or more YubiKeys<a class="headerlink" href="#add-one-or-more-yubikeys" title="Permalink to this headline">¶</a></h2>
+<p>Before enabling this PAM module you need to add at least one YubiKey to the database.</p>
+<p>You can do this by running the <tt class="docutils literal"><span class="pre">yktool</span></tt> with the -a argument and following the on screen instructions:</p>
+<div class="highlight-python"><pre>sudo yktool -a</pre>
+</div>
+<p>Fore more information about the <tt class="docutils literal"><span class="pre">yktool</span></tt> and the available arguments visit the <a class="reference external" href="using_yktool.html"><em>Using yktool</em></a> page.</p>
+</div>
+<div class="section" id="add-appropriate-line-to-your-pam-config-file-s">
+<h2>5. Add appropriate line to your pam config file(s)<a class="headerlink" href="#add-appropriate-line-to-your-pam-config-file-s" title="Permalink to this headline">¶</a></h2>
+<p>Add the following line to your PAM config file and you are good to go:</p>
+<div class="highlight-python"><pre>auth required pam_python.so pam_yubico.py</pre>
+</div>
+<p>For more information about configuring PAM file, visit the <a class="reference external" href="configuring_pam.html"><em>Configuring PAM</em></a> page.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Installation</a><ul>
+<li><a class="reference external" href="#installing-the-dependencies">1. Installing the dependencies</a></li>
+<li><a class="reference external" href="#installing-this-module">2. Installing this module</a></li>
+<li><a class="reference external" href="#create-an-empty-log-file">3. Create an empty log file</a></li>
+<li><a class="reference external" href="#add-one-or-more-yubikeys">4. Add one or more YubiKeys</a></li>
+<li><a class="reference external" href="#add-appropriate-line-to-your-pam-config-file-s">5. Add appropriate line to your pam config file(s)</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="requirements.html"
+                                  title="previous chapter">Requirements</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="installing_pam_python.html"
+                                  title="next chapter">Installing pam_python</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="sources/installation.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installing_pam_python.html" title="Installing pam_python"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="requirements.html" title="Requirements"
+             >previous</a> |</li>
+        <li><a href="index.html">pam_yubico_advanced v0.3.0.dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Tomaž Muraus.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

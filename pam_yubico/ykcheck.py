@@ -1,9 +1,11 @@
 import urllib
 
+from yubico.yubico import Yubico
+from yubico.yubico_exceptions import YubicoError
+
 from database import connection, cursor, create_schema
 
 # Constants
-API_URL = 'https://api.yubico.com/wsapi/verify?id=%s&otp=%s'
 CLIENT_ID_LENGTH = 12
 TOKEN_MIN_LENGTH = 44 # minimum token length (including user id)
 
@@ -13,8 +15,7 @@ class YubiKeyCheck():
         self.cursor = cursor
         
         create_schema()
-        
-        self.api_url = None
+
         self.client_id = None
         self.username = None
         self.user_id = None
@@ -85,20 +86,19 @@ class YubiKeyCheck():
     def __check_otp_online(self):
         """ Returns None if the connection cannot be made, True is the OTP is valid and False otherwise. """
         
-        try:
-            response = urllib.urlopen(self.api_url % (self.client_id, self.otp)).read()
-        except IOError:
-            return None
+        yubico = Yubico(self.client_id)
         
         try:
-            status = response.split('status=')[1].strip()
-        except KeyError:
+            status = yubico.verify(self.otp)
+        except YubicoError:
             return False
         
-        if status == 'OK':
-            return True
+        if status is False:
+            return False
+        elif status is None:
+            return None
         
-        return False
+        return True
 
     def __check_otp_offline(self):
         """ Returns True and updates the counters in the database if the OTP is valid, False otherwise. """

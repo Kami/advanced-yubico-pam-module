@@ -10,7 +10,7 @@
 # http://code.google.com/p/yubico-pam/wiki/ReadMe
 #            
 # Author: Tomaž Muraus (http://www.tomaz-muraus.info)
-# Version: 0.2.0-dev
+# Version: 0.3.0-dev
 
 # Requirements:
 # - Python >= 2.6
@@ -38,7 +38,6 @@ def pam_sm_authenticate(pamh, flags, argv):
     
     ykCheck = ykcheck.YubiKeyCheck()
     ykCheck.username = user
-    ykCheck.api_url = arguments['url']
 
     if not ykCheck.check_user_exists():
         # No user id is set for this username
@@ -120,7 +119,6 @@ def _parse_arguments(args = None):
     arguments = {
             'debug': False,
             'alwaysok': 0,
-            'url': ykcheck.API_URL
     }
     
     if args:

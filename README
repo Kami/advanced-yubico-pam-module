@@ -1,0 +1,4 @@
+Python PAM module which allows you to integrate the Yubikey into your existing user authentication infrastructure (supports online, failback and offline mode).
+
+Documentation:
+  http://kami.github.com/advanced-yubico-pam-module/

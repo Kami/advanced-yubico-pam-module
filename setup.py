@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/env python
 import os
 import re
 from distutils.core import setup
@@ -32,6 +31,7 @@ setup(name = 'pam_yubico',
 	  requires = ['pam_python'],
 	  provides = ['pam_yubico'],
 	  package_data = {'pam_yubico.yubikey': ['COPYING']},
+	  scripts = ['scripts/yktool'],
 	  data_files = [('/lib/security/', ['pam_yubico.py'])],
 	  
 	  classifiers = [

@@ -103,16 +103,16 @@ class YubiKeyTool():
             print 'Yubikey for user with username %s and user ID %s has been successfully re-enabled' % (username, user_id)
     
     def display_database_info(self):
-        result = self.database.get_all_entries(['id', 'username', 'client_id', 'mode', 'enabled'])
+        result = self.database.get_all_entries(['id', 'username', 'client_id', 'user_id', 'mode', 'enabled'])
     
         print 'YubiKeys in the database:\n'
     
         count = len(result)
         if count > 0:
-            print 'ID\t | Username\t | Client ID\t | Mode\t | Status'
+            print 'ID\t | Username\t | Client ID\t | User ID\t | Mode\t | Status'
             for row in result:
-                print '%d\t | %s\t | %d\t | %s\t | %s' % (row['id'], row['username'], row['client_id'], row['mode'],
-                'enabled' if row['enabled'] == 1 else 'disabled')
+                print '%d\t | %s\t | %d\t | %s\t | %s\t | %s' % (row['id'], row['username'], row['client_id'],
+                row['user_id'], row['mode'], 'enabled' if row['enabled'] == 1 else 'disabled')
         
             print '\nTotal: %d' % (count)
         else:

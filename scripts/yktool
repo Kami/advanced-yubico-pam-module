@@ -5,18 +5,15 @@ import optparse
 import datetime
 
 from pam_yubico import ykcheck
-from pam_yubico.database import connection, cursor, create_schema
+from pam_yubico.database import methods as database
 from pam_yubico.yubikey import decrypt
 
 class YubiKeyTool():
     def __init__(self):
         self.__check_uid()
         self.yubikey = None
-        
-        self.connection = connection
-        self.cursor = cursor
-        
-        create_schema()
+        self.database = database
+
 
     def add_yubikey(self):
         print 'Add a new Yubikey\n'
@@ -52,11 +49,11 @@ class YubiKeyTool():
             return
         
         print ''
-        if self.__database_entry_exists(username = username, user_id =  user_id):
+        if self.database.entry_exists(username = username, user_id =  user_id):
             print 'User with this username and user ID already exists.'
             return
         
-        if self.__add_yubikey_to_database(username, client_id, aes_key, user_id, mode):
+        if self.database.add_yubikey(username, client_id, aes_key, user_id, mode):
             print 'User has been successfully added to the database.'
         else:
             print 'Error occurred - user could not be added to the database.'
@@ -71,8 +68,8 @@ class YubiKeyTool():
         username = self.__prompt('Username: ')
         user_id = self.__prompt('User ID: ')
         
-        if self.__database_entry_exists(username = username, user_id = user_id):
-            self.__delete_yubikey_from_database(username, user_id)
+        if self.database.entry_exists(username = username, user_id = user_id):
+            self.database.delete_yubikey(username, user_id)
             print 'User with ID %s has been successfully deleted' % (user_id)
         else:
             print 'User with this username and user ID is not in the database'
@@ -83,31 +80,30 @@ class YubiKeyTool():
         username = self.__prompt('Username: ')
         user_id = self.__prompt('User ID: ')
         
-        if not self.__database_entry_exists(username = username, user_id =  user_id):
+        if not self.database.entry_exists(username = username, user_id =  user_id):
             print 'User with this username and user ID is not in the database'
-        elif self.__database_entry_exists(enabled = 0, username = username, user_id = user_id):
+        elif self.database.entry_exists(enabled = 0, username = username, user_id = user_id):
             print 'Yubikey for this user is already disabled'
         else:
-            self.__disable_yubikey_in_database(username, user_id)
+            self.database.disable_yubikey(username, user_id)
             print 'Yubikey for user with username %s and user ID %s has been successfully disabled' % (username, user_id)
             
     def enable_yubikey(self):
-        print 'Enabled a previously disabled YubiKey\n'
+        print 'Enable a previously disabled YubiKey\n'
         
         username = self.__prompt('Username: ')
         user_id = self.__prompt('User ID: ')
         
-        if not self.__database_entry_exists(username = username, user_id =  user_id):
+        if not self.database.entry_exists(username = username, user_id =  user_id):
             print 'User with this username and user ID is not in the database'
-        elif self.__database_entry_exists(enabled = 1, username = username, user_id = user_id):
+        elif self.database.entry_exists(enabled = 1, username = username, user_id = user_id):
             print 'Yubikey for this user is already enabled'
         else:
-            self.__enable_yubikey_in_database(username, user_id)
+            self.database.enable_yubikey(username, user_id)
             print 'Yubikey for user with username %s and user ID %s has been successfully re-enabled' % (username, user_id)
     
     def display_database_info(self):
-        self.cursor.execute("SELECT id, username, client_id, mode, enabled FROM yubikeys")
-        result = self.cursor.fetchall()
+        result = self.database.get_all_entries(['id', 'username', 'client_id', 'mode', 'enabled'])
     
         print 'YubiKeys in the database:\n'
     
@@ -115,40 +111,12 @@ class YubiKeyTool():
         if count > 0:
             print 'ID\t | Username\t | Client ID\t | Mode\t | Status'
             for row in result:
-                print '%d\t | %s\t | %d\t | %s\t | %s' % (row[0], row[1], row[2], row[3], 'enabled' if row[4] == 1 else 'disabled')
+                print '%d\t | %s\t | %d\t | %s\t | %s' % (row['id'], row['username'], row['client_id'], row['mode'],
+                'enabled' if row['enabled'] == 1 else 'disabled')
         
             print '\nTotal: %d' % (count)
         else:
             print 'The database is empty'
-            
-    def __add_yubikey_to_database(self, username, client_id, aes_key, user_id, mode):
-        date = datetime.datetime.now()
-        self.cursor.execute("INSERT INTO yubikeys (username, client_id, aes_key, user_id, mode, date_created) \
-                            VALUES (?, ?, ?, ?, ?, ?)", (username, client_id, aes_key, user_id, mode, date))
-        self.connection.commit()
-        
-        return self.cursor.rowcount
-    
-    def __disable_yubikey_in_database(self, username, user_id):
-        self.cursor.execute("UPDATE yubikeys SET enabled = 0 WHERE username = :username AND user_id = :user_id", {'username': username, \
-                            'user_id': user_id})
-        self.connection.commit()
-        
-        return self.cursor.rowcount
-    
-    def __enable_yubikey_in_database(self, username, user_id):
-        self.cursor.execute("UPDATE yubikeys SET enabled = 1 WHERE username = :username AND user_id = :user_id", {'username': username, \
-                            'user_id': user_id})
-        self.connection.commit()
-        
-        return self.cursor.rowcount
-    
-    def __delete_yubikey_from_database(self, username, user_id):
-        self.cursor.execute("DELETE FROM yubikeys WHERE username = :username AND user_id = :user_id", {'username': username, \
-                            'user_id': user_id})
-        self.connection.commit()
-        
-        return self.cursor.rowcount
         
     def __prompt(self, message, required = True, validate_function = None, validate_function_kwarg_name = 'input', validate_function_kwargs = None, error_msg = '', valid_options = None):
         input = None
@@ -209,20 +177,6 @@ class YubiKeyTool():
 
         self.yubikey = yubikey
         return True
-    
-    def __database_entry_exists(self, **kwargs):
-        """ Returns True if a database entry with provided values exist, False otherwise. """
-        
-        where_clause = ['%s = :%s' % (key, key) for key in kwargs]
-        where_clause = ' AND ' . join(where_clause)
-        
-        self.cursor.execute("SELECT id FROM yubikeys WHERE %s" % (where_clause), kwargs)
-        result = self.cursor.fetchone()
-        
-        if result:
-            return True
-        
-        return False
     
     def __check_uid(self):
         """ Only root can run this program. """

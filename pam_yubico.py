@@ -10,7 +10,7 @@
 # http://code.google.com/p/yubico-pam/wiki/ReadMe
 #            
 # Author: Tomaž Muraus (http://www.tomaz-muraus.info)
-# Version: 0.3.0-dev
+# Version: 0.4.0-dev
 
 # Requirements:
 # - Python >= 2.6
@@ -23,6 +23,7 @@ import sys
 import logging
 
 from pam_yubico import ykcheck
+from pam_yubico.database import methods as database
 
 # Setup logging
 logging.basicConfig(filename = '/var/log/pam_yubico.log', filemode = 'a', level = logging.DEBUG, format = '%(asctime)s %(levelname)-8s %(message)s', datefmt = '%d.%m.%Y %H:%M:%S')
@@ -39,7 +40,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     ykCheck = ykcheck.YubiKeyCheck()
     ykCheck.username = user
 
-    if not ykCheck.check_user_exists():
+    if not database.entry_exists(username = user):
         # No user id is set for this username
         logging.debug('No YubiKey is set for user %s' % (user))
         return pamh.PAM_AUTHINFO_UNAVAIL
@@ -74,11 +75,11 @@ def pam_sm_authenticate(pamh, flags, argv):
     ykCheck.user_id = user_id
     ykCheck.otp = otp
     
-    if not ykCheck.check_user_is_enabled():
+    if not database.check_user_is_enabled(ykCheck.username, ykCheck.user_id):
         logging.debug('YubiKey for user %s is disabled' % (user))
         return pamh.PAM_AUTH_ERR
 
-    if not ykCheck.check_user_id_matches_one_provided():
+    if not database.check_user_id_matches_one_provided(ykCheck.username, ykCheck.user_id):
         # User ID is not matching
         logging.debug('User ID in the database does not match the one provided by the OTP')
         return pamh.PAM_AUTH_ERR

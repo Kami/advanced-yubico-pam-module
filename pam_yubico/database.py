@@ -1,23 +1,16 @@
-import sqlite3
+import settings
 
-DATABASE_PATH = '/etc/yubikey_database'
+try:
+	database_backend = settings.DATABASE_BACKEND
+except AttributeError:
+	raise AttributeError('Database backend not configured')
 
-connection = sqlite3.connect(DATABASE_PATH)
-cursor = connection.cursor()
+try:
+	name = 'pam_yubico.backends.%s.connection' % (database_backend)
+	module_connection = __import__(name, fromlist = 'DatabaseConnection')
+	database_connection = module_connection.DatabaseConnection(settings.DATABASE_SETTINGS)
+except ImportError:
+	raise ImportError('Invalid database backend specified')
 
-def create_schema():
-    """ Creates the database schema if does not already exist. """
-    
-    cursor.execute("""CREATE TABLE IF NOT EXISTS 'yubikeys'
-    (
-    "id" INTEGER PRIMARY KEY,
-    "username" VARCHAR(100),
-    "client_id" INTEGER,
-    "aes_key" VARCHAR(32),
-    "user_id" VARCHAR(12),
-    "enabled" BOOLEAN DEFAULT (1),
-    "counter" INTEGER DEFAULT (0),
-    "counter_session" INTEGER DEFAULT (0),
-    "date_created" TEXT,
-    "mode" TEXT DEFAULT ('online')
-    )""")
+connection = getattr(database_connection, 'connect')()
+methods = getattr(database_connection, 'get_methods')()

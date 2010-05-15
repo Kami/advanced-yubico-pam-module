@@ -128,17 +128,18 @@ def _parse_arguments(args = None):
         else:
             logging.disable(logging.FATAL)
         
-        logging.debug('Arguments')
+        logging.debug('Arguments:')
+        args = args[1:]
         for argument in args:
-            if len(argument.split('=')) != 2:
-                continue
-            
-            (key, value) = argument.split('=')
-            if key in arguments:
-                if key in ['alwaysok']:
-                    value = int(value)
-                
-                logging.debug('%s = %s' % (key, value)) 
-                arguments[key] = value
+            if len(argument.split('=')) == 2:
+                (key, value) = argument.split('=')
+                if key in arguments:
+                    if key in ['alwaysok']:
+                        value = int(value)
+
+                    logging.debug('%s = %s' % (key, value))
+                    arguments[key] = value
+            else:
+                 logging.debug('%s' % (argument)) 
             
     return arguments

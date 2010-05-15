@@ -22,11 +22,11 @@ import os
 import sys
 import logging
 
-from pam_yubico import ykcheck
+from pam_yubico import settings, ykcheck
 from pam_yubico.database import methods as database
 
 # Setup logging
-logging.basicConfig(filename = '/var/log/pam_yubico.log', filemode = 'a', level = logging.DEBUG, format = '%(asctime)s %(levelname)-8s %(message)s', datefmt = '%d.%m.%Y %H:%M:%S')
+logging.basicConfig(filename = settings.LOG_PATH, filemode = 'a', level = logging.DEBUG, format = '%(asctime)s %(levelname)-8s %(message)s', datefmt = '%d.%m.%Y %H:%M:%S')
 
 class MessagePrompt():
     # Dummy Message class
